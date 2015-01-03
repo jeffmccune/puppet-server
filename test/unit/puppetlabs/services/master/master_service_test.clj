@@ -17,7 +17,7 @@
     [puppetlabs.services.ca.certificate-authority-service :refer [certificate-authority-service]]
     [me.raynes.fs :as fs]))
 
-(deftest ca-files-test
+(deftest ^:serial ca-files-test
   (testing "CA settings from puppet are honored and the CA
             files are created when the service starts up"
     (let [test-dir (doto "target/master-service-test" fs/mkdir)]

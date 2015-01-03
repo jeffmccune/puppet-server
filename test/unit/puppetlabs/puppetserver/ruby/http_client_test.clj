@@ -133,7 +133,7 @@
              {:cipher-suites ~cipher-suites}))
     ~@body))
 
-(deftest https-tls-defaults
+(deftest ^:serial https-tls-defaults
   (testing "requests fail without an SSL client"
     (with-webserver-with-protocols nil nil
        (let [sc (create-scripting-container 10080)]
@@ -166,7 +166,7 @@
          (is (= "200" (.runScriptlet sc "response.code")))
          (is (= "hi" (.runScriptlet sc "response.body")))))))
 
-(deftest https-sslv3
+(deftest ^:serial https-sslv3
   (logutils/with-test-logging
     (with-webserver-with-protocols ["SSLv3"] nil
       (testing "Cannot connect via SSLv3 by default"
@@ -186,7 +186,7 @@
           (is (= "200" (.runScriptlet sc "response.code")))
           (is (= "hi" (.runScriptlet sc "response.body"))))))))
 
-(deftest https-cipher-suites
+(deftest ^:serial https-cipher-suites
   (logutils/with-test-logging
     (with-webserver-with-protocols ["SSLv3"] ["SSL_RSA_WITH_RC4_128_SHA"]
       (testing "Should not be able to connect if no matching ciphers"
@@ -209,7 +209,7 @@
           (is (= "200" (.runScriptlet sc "response.code")))
           (is (= "hi" (.runScriptlet sc "response.body"))))))))
 
-(deftest clients-persist
+(deftest ^:serial clients-persist
   (testing "client persists when making HTTP requests"
     (logutils/with-test-logging
       (jetty9/with-test-webserver ring-app port
@@ -218,7 +218,7 @@
               client2 (.runScriptlet scripting-container "c.post('/', 'foo', {}); c.client")]
           (is (= client1 client2)))))))
 
-(deftest connections-closed
+(deftest ^:serial connections-closed
   (testing "connection header always set to close on get"
     (logutils/with-test-logging
       (jetty9/with-test-webserver ring-app-connection-closed port

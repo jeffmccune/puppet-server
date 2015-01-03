@@ -50,9 +50,12 @@
   :repositories [["releases" "http://nexus.delivery.puppetlabs.net/content/repositories/releases/"]
                  ["snapshots" "http://nexus.delivery.puppetlabs.net/content/repositories/snapshots/"]]
 
-  :plugins [[lein-release "1.0.5"]]
+  :plugins [[lein-release "1.0.5"]
+            [com.holychao/parallel-test "0.3.0"]]
   :lein-release {:scm         :git
                  :deploy-via  :lein-deploy}
+  ; Tests are categorized as :parallel unless explicitly tagged as :serial
+  :parallel-test {:categorizer #(if (:serial %) :serial :parallel)}
 
   :deploy-repositories [["releases" ~(deploy-info "http://nexus.delivery.puppetlabs.net/content/repositories/releases/")]
                         ["snapshots" ~(deploy-info "http://nexus.delivery.puppetlabs.net/content/repositories/snapshots/")]]

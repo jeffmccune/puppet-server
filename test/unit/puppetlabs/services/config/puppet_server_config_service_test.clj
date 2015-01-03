@@ -29,7 +29,7 @@
 (defn valid-semver-number? [v]
   (re-matches #"[0-9]\.[0-9]\.[0-9]" v))
 
-(deftest config-service-functions
+(deftest ^:serial config-service-functions
   (tk-testutils/with-app-with-config
     app
     service-and-deps
