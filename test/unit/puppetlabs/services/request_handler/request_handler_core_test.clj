@@ -35,7 +35,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Tests
 
-(deftest get-cert-common-name-test
+(deftest ^:serial get-cert-common-name-test
   (testing (str "expected common name can be extracted from the certificate on "
                 "a request")
     (let [cert (cert-utils/pem->cert
@@ -44,7 +44,7 @@
   (testing "nil returned for cn when certificate on request is nil"
     (is (nil? (core/get-cert-common-name nil)))))
 
-(deftest wrap-params-for-jruby-test
+(deftest ^:serial wrap-params-for-jruby-test
   (testing "get with no query parameters returns empty params"
     (let [wrapped-request (core/wrap-params-for-jruby
                             {:body (StringReader. "")})]
@@ -100,14 +100,14 @@
       (is (= body-string-from-utf16 (:body-string wrapped-request))
           "Unexpected body string in wrapped request"))))
 
-(deftest unmunge-header-name-works
+(deftest ^:serial unmunge-header-name-works
   (testing "Umunging a puppet.conf http header named works as expected"
     (is (= (core/unmunge-http-header-name "HTTP_X_CLIENT_VERIFY")
            "x-client-verify"))
     (is (= (core/unmunge-http-header-name "HTTP_X_CLIENT_DN")
            "x-client-dn"))))
 
-(deftest cert-info-in-headers
+(deftest ^:serial cert-info-in-headers
   "In the case where Puppet Server is running under HTTP with an upstream HTTPS
   terminator, the cert's CN, cert, and authenticated status will be provided as
   HTTP headers.  If cert info is not provided in the headers but is available
@@ -192,7 +192,7 @@
           (is (= "localhost" (get req :client-cert-cn)))
           (is (identical? cert (get req :client-cert))))))))
 
-(deftest cert-decoding-failures
+(deftest ^:serial cert-decoding-failures
   "A cert provided in the x-client-cert header that cannot be decoded into
   an X509Certificate object throws the expected failure"
   (testing "Improperly URL encoded content"
@@ -219,7 +219,7 @@
                         slurp
                         ring-codec/url-encode))))))
 
-(deftest handle-request-test
+(deftest ^:serial handle-request-test
   (logutils/with-test-logging
     (testing "slingshot bad requests translated to ring response"
       (let [bad-message "it's real bad"]

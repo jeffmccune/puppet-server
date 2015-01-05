@@ -20,7 +20,7 @@
     "./dev-resources/puppetlabs/services/ca/certificate_authority_disabled_test/puppet.conf"
     puppet-conf-dir))
 
-(deftest ca-disabled-files-test
+(deftest ^:serial ca-disabled-files-test
   (testing "Ensure no certificates are generated when CA disabled service is enabled."
     (logutils/with-test-logging
       (tk-testutils/with-app-with-config

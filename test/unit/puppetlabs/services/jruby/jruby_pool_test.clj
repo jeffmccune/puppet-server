@@ -18,7 +18,7 @@
                             #"Input to create-pool-from-config does not match schema"
                             (create-pool-context malformed-config nil))))))
 
-(deftest test-jruby-service-core-funcs
+(deftest ^:serial test-jruby-service-core-funcs
   (let [pool-size        2
         config           (jruby-testutils/jruby-puppet-config {:max-active-instances pool-size})
         profiler         jruby-testutils/default-profiler
@@ -57,7 +57,7 @@
         (is (= (free-instance-count pool) (dec pool-size)))
         (return-to-pool jruby-instance)))))
 
-(deftest prime-pools-failure
+(deftest ^:serial prime-pools-failure
   (let [pool-size 2
         config        (jruby-testutils/jruby-puppet-config {:max-active-instances pool-size})
         profiler      jruby-testutils/default-profiler
@@ -81,7 +81,7 @@
           err-msg
           (borrow-from-pool-with-timeout pool 120))))))
 
-(deftest test-default-pool-size
+(deftest ^:serial test-default-pool-size
   (let [config jruby-testutils/default-config-no-size
         profiler   jruby-testutils/default-profiler
         pool       (create-pool-context config profiler)

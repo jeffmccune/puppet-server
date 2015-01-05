@@ -88,7 +88,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Tests
 
-(deftest crl-endpoint-test
+(deftest ^:serial crl-endpoint-test
   (testing "implementation of the CRL endpoint"
     (let [response (handle-get-certificate-revocation-list
                      {:cacrl (test-pem-file "crl.pem")})]
@@ -97,7 +97,7 @@
       (is (= "text/plain" (get-in response [:headers "Content-Type"])))
       (is (string? (:body response))))))
 
-(deftest puppet-version-header-test
+(deftest ^:serial puppet-version-header-test
   (testing "Responses contain a X-Puppet-Version header"
     (let [version-number "42.42.42"
           ring-app (build-ring-handler (testutils/ca-settings cadir) version-number)
@@ -107,7 +107,7 @@
           response (ring-app request)]
       (is (= version-number (get-in response [:headers "X-Puppet-Version"]))))))
 
-(deftest handle-put-certificate-request!-test
+(deftest ^:serial handle-put-certificate-request!-test
   (let [settings   (assoc (testutils/ca-sandbox! cadir)
                      :allow-duplicate-certs true)
         static-csr (ca/path-to-cert-request (str cadir "/requests") "test-agent")]
@@ -237,7 +237,7 @@
                       "(DNS:altname1, DNS:altname2, DNS:altname3), which are disallowed. "
                       "Use `puppet cert --allow-dns-alt-names sign hostwithaltnames` to sign this request."))))))))
 
-(deftest certificate-status-test
+(deftest ^:serial certificate-status-test
   (testing "read requests"
     (let [test-app (-> (build-ring-handler (testutils/ca-settings cadir) "42.42.42")
                        (wrap-with-ssl-client-cert))]
@@ -490,7 +490,7 @@
           (ks/pprint-to-string response))
       (is (= (:body response) "Unsupported media type.")))))
 
-(deftest cert-status-invalid-csrs
+(deftest ^:serial cert-status-invalid-csrs
   (testing "Asking /certificate_status to sign invalid CSRs"
     (let [settings  (assoc (testutils/ca-settings cadir)
                       :csrdir (str test-resources-dir "/alternate-csrdir"))
@@ -520,7 +520,7 @@
           (is (= (:body response)
                  "Found extensions that are not permitted: 1.9.9.9.9.9.9")))))))
 
-(deftest cert-status-duplicate-certs
+(deftest ^:serial cert-status-duplicate-certs
   (testing "signing a certificate doesn't depend on $allow-duplicate-certs"
     (doseq [bool [false true]]
       (testing bool
@@ -538,7 +538,7 @@
             (is (= 204 (:status response))
                 (ks/pprint-to-string response))))))))
 
-(deftest cert-status-access-control
+(deftest ^:serial cert-status-access-control
   (testing "a request with no certificate is rejected with 403 Forbidden"
     (let [test-app (build-ring-handler (testutils/ca-settings cadir) "1.2.3.4")]
       (doseq [endpoint ["certificate_status" "certificate_statuses"]]

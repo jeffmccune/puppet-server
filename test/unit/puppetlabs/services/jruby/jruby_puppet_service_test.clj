@@ -44,7 +44,7 @@
                          #"^shutdown-on-error triggered because of exception!"
                                 :error))))))
 
-(deftest test-pool-size
+(deftest ^:serial test-pool-size
   (testing "The pool is created and the size is correctly reported"
     (let [pool-size 2]
       (bootstrap/with-app-with-config
@@ -64,7 +64,7 @@
             (jruby-protocol/return-instance service instance))
           (is (= pool-size (jruby-protocol/free-instance-count service))))))))
 
-(deftest test-pool-population-during-init
+(deftest ^:serial test-pool-population-during-init
   (testing "A JRuby instance can be borrowed from the 'init' phase of a service"
     (let [test-service (tk/service
                          [[:JRubyPuppetService borrow-instance return-instance]]
@@ -80,7 +80,7 @@
       ; If execution gets here, the test passed.
       (is (true? true)))))
 
-(deftest test-with-jruby-puppet
+(deftest ^:serial test-with-jruby-puppet
   (testing "the `with-jruby-puppet macro`"
     (bootstrap/with-app-with-config
       app
@@ -94,7 +94,7 @@
           (is (= 0 (jruby-protocol/free-instance-count service))))
         (is (= 1 (jruby-protocol/free-instance-count service)))))))
 
-(deftest test-borrow-timeout-configuration
+(deftest ^:serial test-borrow-timeout-configuration
   (testing "configured :borrow-timeout is honored by the borrow-instance service function"
     (let [timeout   250
           pool-size 1

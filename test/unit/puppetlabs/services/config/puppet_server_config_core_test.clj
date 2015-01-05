@@ -8,7 +8,7 @@
               (jruby-testutils/with-puppet-conf
                 "./dev-resources/puppetlabs/services/config/puppet_server_config_core_test/puppet.conf"))
 
-(deftest test-puppet-config-values
+(deftest ^:serial test-puppet-config-values
   (let [pool-instance (jruby-testutils/create-pool-instance)
         jruby-puppet  (:jruby-puppet pool-instance)]
 

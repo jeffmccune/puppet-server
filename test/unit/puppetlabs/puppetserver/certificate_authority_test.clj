@@ -98,7 +98,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Tests
 
-(deftest get-certificate-test
+(deftest ^:serial get-certificate-test
   (testing "returns CA certificate when subject is 'ca'"
     (let [actual   (get-certificate "ca" cacert signeddir)
           expected (slurp cacert)]
@@ -112,7 +112,7 @@
   (testing "returns nil when certificate not found for subject"
     (is (nil? (get-certificate "not-there" cacert signeddir)))))
 
-(deftest get-certificate-request-test
+(deftest ^:serial get-certificate-request-test
   (testing "returns certificate request for subject"
     (let [cert-req (get-certificate-request "test-agent" csrdir)
           expected (slurp (path-to-cert-request csrdir "test-agent"))]
@@ -121,7 +121,7 @@
   (testing "returns nil when certificate request not found for subject"
     (is (nil? (get-certificate-request "not-there" csrdir)))))
 
-(deftest autosign-csr?-test
+(deftest ^:serial autosign-csr?-test
   (testing "boolean values"
     (is (true? (autosign-csr? true "unused" empty-stream [])))
     (is (false? (autosign-csr? false "unused" empty-stream []))))
@@ -215,7 +215,7 @@
           (assert-no-autosign "coffee#tea")
           (assert-autosign "qux"))))))
 
-(deftest autosign-csr?-ruby-exe-test
+(deftest ^:serial autosign-csr?-ruby-exe-test
   (let [executable (autosign-exe-file "ruby-autosign-executable")
         csr-fn #(csr-stream "test-agent")
         ruby-load-path ["ruby/puppet/lib" "ruby/facter/lib"]]
@@ -242,7 +242,7 @@
         (is (true? (autosign-csr? executable "test-agent" (csr-fn) ruby-load-path)))
         (is (false? (autosign-csr? executable "foo" (csr-fn) ruby-load-path)))))))
 
-(deftest autosign-csr?-bash-exe-test
+(deftest ^:serial autosign-csr?-bash-exe-test
   (let [executable (autosign-exe-file "bash-autosign-executable")
         csr-fn #(csr-stream "test-agent")]
 
@@ -263,7 +263,7 @@
         (is (true? (autosign-csr? executable "test-agent" (csr-fn) [])))
         (is (false? (autosign-csr? executable "foo" (csr-fn) [])))))))
 
-(deftest save-certificate-request!-test
+(deftest ^:serial save-certificate-request!-test
   (testing "requests are saved to disk"
     (let [csrdir   (:csrdir (testutils/ca-sandbox! cadir))
           csr      (utils/pem->csr (path-to-cert-request csrdir "test-agent"))
@@ -274,7 +274,7 @@
       (is (= (get-certificate-request csrdir "foo")
              (get-certificate-request csrdir "test-agent"))))))
 
-(deftest autosign-certificate-request!-test
+(deftest ^:serial autosign-certificate-request!-test
   (let [now                (time/epoch)
         two-years          (* 60 60 24 365 2)
         settings           (-> (testutils/ca-sandbox! cadir)
@@ -305,7 +305,7 @@
           (testing "not-after is 2 years from now"
             (is (= (time/plus now (time/years 2)) not-after))))))))
 
-(deftest autosign-without-capub
+(deftest ^:serial autosign-without-capub
   (testing "The CA public key file is not necessary to autosign"
     (let [settings  (testutils/ca-sandbox! cadir)
           csr       (-> (:csrdir settings)
@@ -321,7 +321,7 @@
                       (.getPublicKey))]
         (is (nil? (.verify cert capub)))))))
 
-(deftest revoke-without-capub
+(deftest ^:serial revoke-without-capub
   (testing "The CA public key file is not necessary to revoke"
     (let [settings (testutils/ca-sandbox! cadir)
           cert     (-> (:signeddir settings)
@@ -336,14 +336,14 @@
       (revoke-existing-cert! settings "localhost")
       (is (true? (revoked? cert))))))
 
-(deftest get-certificate-revocation-list-test
+(deftest ^:serial get-certificate-revocation-list-test
   (testing "`get-certificate-revocation-list` returns a valid CRL file."
     (let [crl (-> (get-certificate-revocation-list cacrl)
                   StringReader.
                   utils/pem->crl)]
       (testutils/assert-issuer crl "CN=Puppet CA: localhost"))))
 
-(deftest initialize!-test
+(deftest ^:serial initialize!-test
   (let [settings (testutils/ca-settings (ks/temp-dir))]
 
     (initialize! settings 512)
@@ -394,7 +394,7 @@
         (doseq [f files] (is (= "testable string" (slurp f))
                              "File was replaced"))))))
 
-(deftest ca-fail-fast-test
+(deftest ^:serial ca-fail-fast-test
   (testing "Directories not required but are created if absent"
     (doseq [dir [:signeddir :csrdir]]
       (testing dir
@@ -419,7 +419,7 @@
                (re-pattern (str "Missing:\n" path))
                (initialize! settings 512))))))))
 
-(deftest retrieve-ca-cert!-test
+(deftest ^:serial retrieve-ca-cert!-test
   (testing "CA file copied when it doesn't already exist"
     (let [tmp-confdir (fs/copy-dir confdir (ks/temp-dir))
           settings    (testutils/master-settings tmp-confdir)
@@ -448,7 +448,7 @@
               "No exception thrown even though no file existed for copying")
           (fs/copy copy cacert))))))
 
-(deftest initialize-master-ssl!-test
+(deftest ^:serial initialize-master-ssl!-test
   (let [tmp-confdir (fs/copy-dir confdir (ks/temp-dir))
         settings    (-> (testutils/master-settings tmp-confdir "master")
                         (assoc :dns-alt-names "onefish,twofish"))
@@ -510,17 +510,17 @@
                  (initialize-master-ssl! settings "master" ca-settings 512)))
             (fs/copy copy path)))))))
 
-(deftest parse-serial-number-test
+(deftest ^:serial parse-serial-number-test
   (is (= (parse-serial-number "0001") 1))
   (is (= (parse-serial-number "0010") 16))
   (is (= (parse-serial-number "002A") 42)))
 
-(deftest format-serial-number-test
+(deftest ^:serial format-serial-number-test
   (is (= (format-serial-number 1) "0001"))
   (is (= (format-serial-number 16) "0010"))
   (is (= (format-serial-number 42) "002A")))
 
-(deftest next-serial-number!-test
+(deftest ^:serial next-serial-number!-test
   (let [serial-file (str (ks/temp-file))]
     (testing "Serial file is initialized to 1"
       (initialize-serial-file! serial-file)
@@ -540,7 +540,7 @@
 ;; which is not as nice as simply failing ...
 ;; This seems to happen due to a deadlock caused by concurrently reading and
 ;; writing to the same file (via `slurp` and `spit`)
-(deftest next-serial-number-threadsafety
+(deftest ^:serial next-serial-number-threadsafety
   (testing "next-serial-number! is thread-safe and
             never returns a duplicate serial number"
     (let [serial-file (doto (str (ks/temp-file)) (spit "0001"))
@@ -573,7 +573,7 @@
     (is (= not-after (nth parts 2)))
     (is (= subject (string/join " " (subvec parts 3))))))
 
-(deftest test-write-cert-to-inventory
+(deftest ^:serial test-write-cert-to-inventory
   (testing "Certs can be written to an inventory file."
     (let [first-cert     (utils/pem->cert cacert)
           second-cert    (utils/pem->cert (path-to-cert signeddir "localhost"))
@@ -601,7 +601,7 @@
             "2019-02-14T18:09:07UTC"
             "/CN=localhost"))))))
 
-(deftest allow-duplicate-certs-test
+(deftest ^:serial allow-duplicate-certs-test
   (let [settings (assoc (testutils/ca-sandbox! cadir) :autosign false)]
     (testing "when false"
       (let [settings (assoc settings :allow-duplicate-certs false)]
@@ -647,7 +647,7 @@
               (is (logged? #"localhost already has a signed certificate; new certificate will overwrite it" :info))
               (is (not= old-cert (slurp cert-path)) "Existing certificate was not overwritten"))))))))
 
-(deftest process-csr-submission!-test
+(deftest ^:serial process-csr-submission!-test
   (let [settings (testutils/ca-sandbox! cadir)]
     (testing "CSR validation policies"
       (testing "when autosign is false"
@@ -739,7 +739,7 @@
                   :message "Instance name \"hostwithaltnames\" does not match requested key \"foo\""}
                  (process-csr-submission! "foo" csr-with-disallowed-alt-names settings)))))))))
 
-(deftest cert-signing-extension-test
+(deftest ^:serial cert-signing-extension-test
   (let [issuer-keys  (utils/generate-key-pair 512)
         issuer-pub   (utils/get-public-key issuer-keys)
         subject-keys (utils/generate-key-pair 512)
@@ -941,11 +941,11 @@
         (is (= (set exts) (set exts-expected))
             "The puppet trusted facts extensions were not added by create-agent-extensions")))))
 
-(deftest netscape-comment-value-test
+(deftest ^:serial netscape-comment-value-test
   (testing "Netscape comment constant has expected value"
     (is (= "Puppet Server Internal Certificate" netscape-comment-value))))
 
-(deftest validate-subject!-test
+(deftest ^:serial validate-subject!-test
   (testing "an exception is thrown when the hostnames don't match"
     (is (thrown-with-slingshot?
           {:type    :hostname-mismatch
@@ -960,7 +960,7 @@
           (validate-subject! "Host-With-Capital-Letters"
                              "Host-With-Capital-Letters")))))
 
-(deftest validate-dns-alt-names!-test
+(deftest ^:serial validate-dns-alt-names!-test
   (testing "Only DNS alt names are allowed"
     (is (thrown-with-slingshot?
           {:type    :invalid-alt-name
@@ -977,14 +977,14 @@
                                     :critical false
                                     :value {:dns-name ["ahostname" "foo*bar"]}})))))
 
-(deftest config-test
+(deftest ^:serial config-test
   (testing "throws meaningful user error when required config not found"
     (is (thrown-with-msg?
          IllegalStateException
          #".*certificate-authority: \{ certificate-status: \{ client-whitelist: \[...] } }.*puppet-server.conf.*"
          (config->ca-settings {})))))
 
-(deftest default-master-dns-alt-names
+(deftest ^:serial default-master-dns-alt-names
   (testing "Master certificate has default DNS alt names if none are specified"
     (let [settings  (assoc (testutils/master-settings confdir)
                       :dns-alt-names "")

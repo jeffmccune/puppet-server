@@ -16,7 +16,7 @@
 (use-fixtures :once schema-test/validate-schemas)
 (use-fixtures :each jruby-testutils/mock-pool-instance-fixture)
 
-(deftest basic-flush-test
+(deftest ^:serial basic-flush-test
   (testing "Flushing the pool results in all new JRuby instances"
     (tk-testutils/with-app-with-config
       app
@@ -43,7 +43,7 @@
                         (constantly
                           "begin; InstanceID; false; rescue NameError; true; end")))))))))
 
-(deftest retry-poison-pill-test
+(deftest ^:serial retry-poison-pill-test
   (testing "Flush puts a retry poison pill into the old pool"
     (tk-testutils/with-app-with-config
       app
@@ -71,7 +71,7 @@
         (let [old-pool-instance (jruby-core/borrow-from-pool old-pool)]
           (is (jruby-core/retry-poison-pill? old-pool-instance)))))))
 
-(deftest with-jruby-retry-test-via-mock-get-pool
+(deftest ^:serial with-jruby-retry-test-via-mock-get-pool
   (testing "with-jruby-puppet retries if it encounters a RetryPoisonPill"
     (tk-testutils/with-app-with-config
       app

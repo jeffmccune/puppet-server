@@ -74,7 +74,7 @@
                                     port use-ssl?)))
      sc)))
 
-(deftest test-ruby-http-client
+(deftest ^:serial test-ruby-http-client
   (jetty9/with-test-webserver ring-app port
     (let [scripting-container (create-scripting-container port)]
       (testing "HTTP GET"
@@ -83,7 +83,7 @@
       (testing "HTTP POST"
         (is (= "hi" (.runScriptlet scripting-container "c.post('/', 'foo', {}).body")))))))
 
-(deftest http-basic-auth
+(deftest ^:serial http-basic-auth
   (jetty9/with-test-webserver ring-app-with-auth port
     (let [scripting-container (create-scripting-container port)]
       (testing "no credentials"
