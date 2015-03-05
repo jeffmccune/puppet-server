@@ -10,3 +10,16 @@ step "AIO: Add /opt/puppetlabs/bin to PATH (REMOVE ONCE https://tickets.puppetla
     on host, 'sed -i s,PATH=,PATH=/opt/puppetlabs/bin:/opt/puppetlabs/puppet/bin:, ~/.ssh/environment'
   end
 end
+
+test_name 'AIO: (PUP-3997) Remove this work around once PUP-3997 is resolved' do
+  agents.each do |agent|
+    if agent == master
+      step "Skipping creating puppet user and group on #{agent}"
+    else
+      step "Ensure puppet user and group added to #{agent}" do
+        on agent, puppet("resource user puppet ensure=present")
+        on agent, puppet("resource group puppet ensure=present")
+      end
+    end
+  end
+end
