@@ -19,7 +19,8 @@ group :test do
   # See: SERVER-435 for the reasoning behind this specific version
   gem 'beaker', *location_for(ENV['BEAKER_LOCATION'] || 'git://github.com/puppetlabs/beaker#7d0cccf22cc7289113de862fe4a4494872f574bb')
   if ENV['GEM_SOURCE'] =~ /rubygems\.delivery\.puppetlabs\.net/
-    gem 'sqa-utils', '~> 0.11'
+    # gem 'sqa-utils', *location_for(ENV['SQA_UTILS_GEM_LOCATION'] || '~> 0.11')
+    gem 'sqa-utils', *location_for(ENV['SQA_UTILS_GEM_LOCATION'] || 'git@github.com:puppetlabs/sqa-utils-gem#master')
   end
   gem 'httparty'
   gem 'uuidtools'
