@@ -109,3 +109,19 @@
         (-> (ring/response (format "Internal Server Error: %s" e))
             (ring/status 500)
             (ring/content-type "text/plain"))))))
+
+(defn- map-accept-raw
+  "Map :accept 'raw' to :accept 'binary'"
+  [request]
+  #spy/d request
+  (if-let [accept (:accept request)]
+    (if (= "raw" accept)
+      (assoc request :accept "binary")
+      request)
+    request))
+
+(defn wrap-with-accept-binary
+  "Translate `Accept: raw` to `Accept: binary`"
+  [handler]
+  (fn [request]
+    (handler #spy/d (map-accept-raw request))))

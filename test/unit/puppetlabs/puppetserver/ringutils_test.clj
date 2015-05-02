@@ -58,3 +58,39 @@
       (let [response (ring-handler (test-request other-cert))]
         (is (= 200 (:status response)))
         (is (= "hello" (:body response)))))))
+
+
+(defn- accept-request
+  [accept]
+  {:uri "/foo"
+   :request-method :get
+   :accept accept})
+
+(defn build-v3-ring-handler
+  [check-fn]
+  (->
+    base-handler
+    (check-fn)
+    (wrap-with-accept-binary)))
+
+(defn wrap-accept-raw-check
+  [handler]
+  (fn [request]
+    (testing "`Accept: raw` is translated to `Accept: binary`"
+      (is (= "binary" (:accept request))))
+    (handler request)))
+
+(deftest wrap-with-accept-binary-test
+  (let [ring-handler (build-v3-ring-handler wrap-accept-raw-check)]
+    (let [response (ring-handler (accept-request "raw"))]
+      (testing "Response is 200 OK"
+        (is (= 200 (:status response)))))
+    (let [response (ring-handler (accept-request "raw, s"))]
+      (testing "Response is 200 OK"
+        (is (= 200 (:status response)))))
+    (let [response (ring-handler (accept-request "foo, raw, s"))]
+      (testing "Response is 200 OK"
+        (is (= 200 (:status response)))))
+    (let [response (ring-handler (accept-request "s, raw"))]
+      (testing "Response is 200 OK"
+        (is (= 200 (:status response)))))))
