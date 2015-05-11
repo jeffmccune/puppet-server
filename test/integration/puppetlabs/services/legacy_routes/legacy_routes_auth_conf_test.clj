@@ -20,7 +20,7 @@
     (str "https://localhost:8140" path)
     bootstrap/request-options))
 
-(deftest ^:integration legacy-routes
+(deftest ^:integration legacy-routes-auth-conf
   (testing "The legacy web routing with puppet 4 version custom auth.conf"
     (testing "when localhost has access to the resource named `private`"
       (bootstrap/with-puppetserver-running app {}
