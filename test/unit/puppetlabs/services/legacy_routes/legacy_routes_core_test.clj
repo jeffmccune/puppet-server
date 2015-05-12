@@ -147,8 +147,4 @@
         (test-munged-request request
           (fn [munged-request] ; ring middleware
             (let [actual (get-in munged-request content-type-header)]
-              (is (= "application/octet-stream" actual)))))
-        (test-munged-request request
-          (fn [munged-request] ; ring middleware
-            (let [actual (get-in munged-request content-type-header)]
               (is (= "application/octet-stream" actual)))))))))
