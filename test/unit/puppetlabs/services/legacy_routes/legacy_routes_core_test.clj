@@ -41,10 +41,10 @@
 
   {path {method {example expected}}}"
   {
-   "/" {:head {"raw" "raw"}
-        :post {"raw" "raw"}
-        :get {"raw" "raw"
-              "foo,bar" "foo,bar"}}
+   "/production/node/anode" { :get {"raw" "binary"
+                                    "foo,bar" "foo, bar"}}
+   "/production/facts/anode" { :get {"raw" "binary"
+                                     "foo,bar" "foo, bar"}}
    "/production/catalog/anode" {:get accept-header-raw-examples
                                 :post accept-header-raw-examples}
    "/production/file_content/something" {:get accept-header-raw-examples}
@@ -75,7 +75,11 @@
   "Validate a request by threading it through the legacy-routes request handler
   into an assertion-wrapper ring middleware."
   [request assertion]
-  ((validating-app assertion) request))
+  (let [mem (atom {:tested false})
+        wrapped-assertion #((swap! mem assoc :tested true) (assertion %))
+        response ((validating-app wrapped-assertion) request)]
+    (is (true? (:tested @mem)) (str "request not tested: " (pr-str request)))
+    response))
 
 (deftest test-legacy-routes
   (let [app     (build-ring-handler
