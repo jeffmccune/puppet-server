@@ -74,7 +74,8 @@
       (log/infof "AUTHZ: Loading rules from %s" rules-path)
       (config/config-file->rules rules-path))
     (do
-      (log/infof "AUTHZ: Loading rules from compiled-in defaults")
+      (log/infof "AUTHZ: Loading compiled-in default rules because %s does not exist"
+                 rules-path)
       authz-default-rules)))
 
 (defn get-cert-subject
