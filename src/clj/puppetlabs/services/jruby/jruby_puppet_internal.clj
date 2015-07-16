@@ -139,6 +139,15 @@
                            [:master-log-dir "logdir"]]]
       (if-let [value (get config setting)]
         (.put puppet-config dir (fs/absolute-path value))))
+    (if (= "true" (System/getenv "FEATURE_TK_AUTHZ"))
+      (do
+        (log/info (str "Configuring Puppet with bypass_authorization = true "
+                       "because FEATURE_TK_AUTHZ=true"))
+        (.put puppet-config "bypass_authorization" "true"))
+      (do
+        (log/info (str "Configuring Puppet with bypass_authorization = false "
+                       "because FEATURE_TK_AUTHZ is not 'true'"))
+        (.put puppet-config "bypass_authorization" "false")))
     puppet-config))
 
 (schema/defn borrow-with-timeout-fn :- jruby-schemas/JRubyPuppetBorrowResult

@@ -122,6 +122,7 @@
   [handler :- IFn
    puppet-version :- schema/Str]
   (-> handler
+      ringutils/wrap-with-authz-rules-check-maybe
       ringutils/wrap-exception-handling
       ringutils/wrap-request-logging
       ringutils/wrap-response-logging

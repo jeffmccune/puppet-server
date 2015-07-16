@@ -183,6 +183,17 @@
           (handler req)
           {:status 403 :body message})))))
 
+(schema/defn ^:always-validate wrap-with-authz-rules-check-maybe :- IFn
+  "Wraps the handler using wrap-with-authz-rules-check if the environment
+  variable FEATURE_TK_AUTHZ has the string value 'true'.  This is a lightweight
+  feature flag."
+  [handler :- IFn]
+  (if (= "true" (System/getenv "FEATURE_TK_AUTHZ"))
+    (do
+      (log/info "Using tk-authz because FEATURE_TK_AUTHZ=true")
+      (wrap-with-authz-rules-check handler))
+    handler))
+
 (defn wrap-exception-handling
   "Wraps a ring handler with try/catch that will catch all Exceptions, log them,
   and return an HTTP 500 response which includes the Exception type and message,
