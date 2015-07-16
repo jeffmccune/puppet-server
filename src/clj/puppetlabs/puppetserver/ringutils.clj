@@ -68,10 +68,13 @@
   []
   (if (fs/exists? rules-path)
     (do
-      (log/debugf "AUTHZ: Loading rules from %s" rules-path)
+      ; This should be debug, but the debug output is WAY TOO DENSE
+      ; to be useful during development, so I'm leaving it at info for the time
+      ; being.
+      (log/infof "AUTHZ: Loading rules from %s" rules-path)
       (config/config-file->rules rules-path))
     (do
-      (log/debugf "AUTHZ: Loading rules from compiled-in defaults")
+      (log/infof "AUTHZ: Loading rules from compiled-in defaults")
       authz-default-rules)))
 
 (defn get-cert-subject
@@ -172,11 +175,11 @@
           allowed (:authorized authorization-result)
           log-data (authz-request-data-str authorization-result request)
           access-str (if allowed "Granted" "Denied")]
-      (log/debugf "AUTHZ: Access %s JSON=%s" access-str log-data)
+      (log/infof "AUTHZ: Access %s JSON=%s" access-str log-data)
       authorization-result)
     (do                                                     ; FIXME Do we really need this "then" branch?
-      (log/debugf "AUTHZ: Access Denied (No ssl-client-cert present) JSON=%s"
-                  (authz-request-data-str {} request))
+      (log/infof "AUTHZ: Access Denied (No ssl-client-cert present) JSON=%s"
+                 (authz-request-data-str {} request))
       ; This seems terrible, look into if tk-authorization has a way to generate an AuthorizationResult
       {:authorized false, :message "No ssl-client cert present"})))
 
@@ -212,7 +215,7 @@
   [handler :- IFn]
   (if (= "true" (System/getenv "FEATURE_TK_AUTHZ"))
     (do
-      (log/info "Using tk-authz because FEATURE_TK_AUTHZ=true")
+      (log/info "AUTHZ: Using tk-authz because FEATURE_TK_AUTHZ=true")
       (wrap-with-authz-rules-check handler))
     handler))
 
