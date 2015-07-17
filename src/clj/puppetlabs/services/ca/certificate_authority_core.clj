@@ -135,12 +135,6 @@
   [subject settings rules-fn]
   :allowed-methods [:get :put :delete]
 
-  :allowed? (fn [context]
-              (ringutils/authorized?
-                (ringutils/authorize-request
-                  (rules-fn)
-                  (:request context))))
-
   :available-media-types media-types
 
   :can-put-to-missing? false
@@ -243,12 +237,6 @@
   [settings rules-fn]
   :allowed-methods [:get]
 
-  :allowed? (fn [context]
-              (ringutils/authorized?
-                (ringutils/authorize-request
-                  (rules-fn)
-                  (:request context))))
-
   :available-media-types media-types
 
   :handle-exception
@@ -289,6 +277,7 @@
    puppet-version :- schema/Str]
   (-> handler
     ;(liberator-dev/wrap-trace :header)           ; very useful for debugging!
+      (ringutils/wrap-with-authz-rules-check)
       (ringutils/wrap-exception-handling)
       (ringutils/wrap-with-puppet-version-header puppet-version)
       (ringutils/wrap-response-logging)))
