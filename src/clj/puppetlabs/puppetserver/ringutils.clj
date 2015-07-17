@@ -37,7 +37,29 @@
   (-> rules/empty-rules
       (rules/add-rule (rules/new-path-rule "/puppet-admin-api/"))
       (rules/add-rule (rules/new-path-rule "/certificate_status/"))
-      (rules/add-rule (rules/new-path-rule "/certificate_statuses/"))))
+      (rules/add-rule (rules/new-path-rule "/certificate_statuses/"))
+      ; Translation of auth.conf from Puppet 4.2.0
+      (rules/add-rule (-> (rules/new-path-rule "/puppet/v3/environments" :get)
+                          (rules/allow "*")))
+      (rules/add-rule (-> (rules/new-regex-rule "^/puppet/v3/catalog/([^/]+)$" :post)
+                          (rules/allow "$1")))
+      (rules/add-rule (-> (rules/new-regex-rule "^/puppet/v3/node/([^/]+)$" :get)
+                          (rules/allow "$1")))
+      (rules/add-rule (-> (rules/new-regex-rule "^/puppet/v3/report/([^/]+)$" :put)
+                          (rules/allow "$1")))
+      (rules/add-rule (-> (rules/new-path-rule "/puppet/v3/file" :any)
+                          (rules/allow "*")))
+      (rules/add-rule (-> (rules/new-path-rule "/puppet/v3/status" :get)
+                          (rules/allow "*")))
+      (rules/add-rule (-> (rules/new-path-rule "/puppet-ca/v1/certificate_revocation_list/ca" :get)
+                          (rules/allow "*")))
+      (rules/add-rule (-> (rules/new-path-rule "/puppet-ca/v1/certificate/ca" :get)
+                          (rules/allow "*")))
+      (rules/add-rule (-> (rules/new-path-rule "/puppet-ca/v1/certificate/" :get)
+                          (rules/allow "*")))
+      (rules/add-rule (-> (rules/new-path-rule "/puppet-ca/v1/certificate_request" :get)
+                          (rules/allow "*")))
+      ))
 
 (defn authz-rules
   "Load a authz rules from rules-path if it exists, otherwise load hard-coded
