@@ -143,11 +143,13 @@
       (do
         (log/info (str "Configuring Puppet with bypass_authorization = true "
                        "because FEATURE_TK_AUTHZ=true"))
-        (.put puppet-config "bypass_authorization" "true"))
+        ; NB Passed on ARGV use --foo or --no-foo form
+        (.put puppet-config "bypass_authorization" ""))
       (do
         (log/info (str "Configuring Puppet with bypass_authorization = false "
                        "because FEATURE_TK_AUTHZ is not 'true'"))
-        (.put puppet-config "bypass_authorization" "false")))
+        ; NB Passed on ARGV use --foo or --no-foo form
+        (.put puppet-config "no-bypass_authorization" "")))
     puppet-config))
 
 (schema/defn borrow-with-timeout-fn :- jruby-schemas/JRubyPuppetBorrowResult
